@@ -26,4 +26,4 @@ app.include_router(vehicles.router)
 
 @app.get("/")
 async def root():
-    return {"message": "Concesionario API running"}
+    return {"message": "Concesionario API corriendo"}

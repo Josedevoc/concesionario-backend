@@ -21,5 +21,14 @@ vehicles_table = sqlalchemy.Table(
     sqlalchemy.Column("created_at", sqlalchemy.DateTime, server_default=sqlalchemy.func.now()),
 )
 
+users_table = sqlalchemy.Table(
+    "users",
+    metadata,
+    sqlalchemy.Column("id", sqlalchemy.Integer, primary_key=True),
+    sqlalchemy.Column("username", sqlalchemy.String(100), nullable=False, unique=True),
+    sqlalchemy.Column("hashed_password", sqlalchemy.String(200), nullable=False),
+    sqlalchemy.Column("created_at", sqlalchemy.DateTime, server_default=sqlalchemy.func.now()),
+)
+
 engine = sqlalchemy.create_engine(DATABASE_URL)
 metadata.create_all(engine)
