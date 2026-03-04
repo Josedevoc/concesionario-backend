@@ -1,17 +1,18 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Depends
 from app.database import database, vehicles_table
 from app.schemas import VehicleCreate, VehicleUpdate, VehicleResponse
+from app.dependencies import get_current_user
 from typing import List
 
 router = APIRouter(prefix="/api/vehicles", tags=["vehicles"])
 
 @router.get("/", response_model=List[VehicleResponse])
-async def get_all():
+async def get_all(current_user: str = Depends(get_current_user)):
     query = vehicles_table.select().order_by(vehicles_table.c.created_at.desc())
     return await database.fetch_all(query)
 
 @router.post("/", response_model=VehicleResponse, status_code=201)
-async def create(vehicle: VehicleCreate):
+async def create(vehicle: VehicleCreate, current_user: str = Depends(get_current_user)):
     query = vehicles_table.insert().values(**vehicle.model_dump())
     vehicle_id = await database.execute(query)
     return await database.fetch_one(
@@ -19,7 +20,7 @@ async def create(vehicle: VehicleCreate):
     )
 
 @router.put("/{vehicle_id}", response_model=VehicleResponse)
-async def update(vehicle_id: int, vehicle: VehicleUpdate):
+async def update(vehicle_id: int, vehicle: VehicleUpdate, current_user: str = Depends(get_current_user)):
     exists = await database.fetch_one(
         vehicles_table.select().where(vehicles_table.c.id == vehicle_id)
     )
@@ -34,7 +35,7 @@ async def update(vehicle_id: int, vehicle: VehicleUpdate):
     )
 
 @router.delete("/{vehicle_id}", status_code=204)
-async def delete(vehicle_id: int):
+async def delete(vehicle_id: int, current_user: str = Depends(get_current_user)):
     exists = await database.fetch_one(
         vehicles_table.select().where(vehicles_table.c.id == vehicle_id)
     )
