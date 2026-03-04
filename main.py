@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.database import database
 from app.routers import vehicles
+from app.routers import auth
 
 app = FastAPI(title="Concesionario API")
 
@@ -20,6 +21,7 @@ async def startup():
 async def shutdown():
     await database.disconnect()
 
+app.include_router(auth.router)
 app.include_router(vehicles.router)
 
 @app.get("/")
